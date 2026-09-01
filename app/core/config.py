@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     WEBHOOK_URL: str
     SECRET_TOKEN: str
 
-    GEMINI_API_KEY: str
+    GROQ_API_KEY: str
 
     SUPABASE_URL: str
     SUPABASE_KEY: str
