@@ -133,12 +133,15 @@ async def lifespan(app: FastAPI):
 
     bot: Bot = telegram_app.bot
     webhook_endpoint = f"{settings.WEBHOOK_URL.rstrip('/')}/webhook"
-    await bot.set_webhook(
-        url=webhook_endpoint,
-        secret_token=settings.SECRET_TOKEN,
-        drop_pending_updates=True,
-    )
-    logger.info(f"Webhook activo en: {webhook_endpoint}")
+    try:
+        await bot.set_webhook(
+            url=webhook_endpoint,
+            secret_token=settings.SECRET_TOKEN,
+            drop_pending_updates=True,
+        )
+        logger.info(f"Webhook activo en: {webhook_endpoint}")
+    except Exception as e:
+        logger.warning(f"No se pudo registrar webhook: {e}. La app seguirá funcionando.")
 
     yield
 
