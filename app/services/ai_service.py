@@ -31,8 +31,8 @@ class GroqTutorService:
         if not api_key:
             raise ValueError("GROQ_API_KEY no está configurada.")
         self.client = Groq(api_key=api_key)
-        self.chat_model = "llama-3.1-8b-instant"
-        self.whisper_model = "whisper-large-v3"
+        self.chat_model = "openai/gpt-oss-20b"
+        self.whisper_model = "whisper-large-v3-turbo"
 
     async def generate_tutor_response(
         self,
