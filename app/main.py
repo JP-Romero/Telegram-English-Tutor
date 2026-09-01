@@ -33,10 +33,17 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await repo.ensure_user_exists(user.id, user.username, user.first_name)
 
         welcome_text = (
-            f"👋 **Hello {user.first_name}! I am Echo, your AI English Tutor.**\n\n"
-            "You can send me **text messages** or **voice notes** 🎙️ in English.\n"
-            "I'll give you feedback on your grammar and pronunciation!\n\n"
-            "*Send me a voice note or message to start!*"
+            f"👋 **¡Hola {user.first_name}! Soy Echo, tu tutor bilingüe de inglés.**\n\n"
+            "Puedes enviarme:\n"
+            "📝 **Mensajes de texto** - En español o inglés\n"
+            "🎙️ **Notas de voz** - Para practicar pronunciación\n"
+            "🖼️ **Fotos** - Para aprender vocabulario nuevo\n\n"
+            "**También puedo:**\n"
+            "🎓 Enseñarte paso a paso\n"
+            "🔄 Traducir textos\n"
+            "💬 Tener conversaciones sobre cualquier tema\n"
+            "🖼️ Generar imágenes con IA\n\n"
+            "*¡Escribe algo o envíame una foto para empezar!*"
         )
         await update.message.reply_markdown(welcome_text)
 
@@ -108,7 +115,52 @@ async def handle_voice_message(
     except Exception as e:
         logger.error(f"Error procesando nota de voz de {user.id}: {e}", exc_info=True)
         await update.message.reply_text(
-            "Sorry, I had trouble downloading or listening to your voice note."
+            "Tuve problemas descargando tu nota de voz. ¡Intenta de nuevo!"
+        )
+
+
+async def handle_photo_message(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
+    if not update.message or not update.message.photo or not update.message.from_user:
+        return
+
+    user = update.message.from_user
+    logger.info(f"Foto recibida de {user.id}")
+
+    await repo.ensure_user_exists(user.id, user.username, user.first_name)
+    await context.bot.send_chat_action(
+        chat_id=update.message.chat_id, action="typing"
+    )
+
+    try:
+        photo = update.message.photo[-1]
+        photo_file = await context.bot.get_file(photo.file_id)
+        out_buffer = io.BytesIO()
+        await photo_file.download_to_memory(out_buffer)
+        image_bytes = out_buffer.getvalue()
+
+        mime_type = "image/jpeg"
+
+        history = await repo.get_recent_history(user.id, limit=6)
+        ai_response = await ai_service.generate_tutor_image_response(
+            image_bytes=image_bytes,
+            mime_type=mime_type,
+            history=history,
+        )
+
+        await repo.save_message(user.id, "user", "[Image Sent]")
+        await repo.save_message(user.id, "model", ai_response)
+
+        try:
+            await update.message.reply_markdown(ai_response)
+        except Exception:
+            await update.message.reply_text(ai_response)
+
+    except Exception as e:
+        logger.error(f"Error procesando foto de {user.id}: {e}", exc_info=True)
+        await update.message.reply_text(
+            "Tuve problemas analizando la imagen. ¡Intenta enviarla de nuevo!"
         )
 
 
@@ -119,6 +171,9 @@ telegram_app.add_handler(
 )
 telegram_app.add_handler(
     MessageHandler(filters.VOICE | filters.AUDIO, handle_voice_message)
+)
+telegram_app.add_handler(
+    MessageHandler(filters.PHOTO, handle_photo_message)
 )
 
 
