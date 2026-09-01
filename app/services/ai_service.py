@@ -31,7 +31,7 @@ class GeminiService:
         if not api_key:
             raise ValueError("GEMINI_API_KEY no está configurada.")
         self.client = genai.Client(api_key=api_key)
-        self.model_name = "gemini-2.0-flash"
+        self.model_name = "gemini-1.5-flash"
 
     async def generate_tutor_response(
         self,
