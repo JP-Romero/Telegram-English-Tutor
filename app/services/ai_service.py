@@ -45,7 +45,10 @@ class GroqTutorService:
 
             if history:
                 for msg in history:
-                    messages.append({"role": msg["role"], "content": msg["content"]})
+                    role = msg["role"]
+                    if role == "model":
+                        role = "assistant"
+                    messages.append({"role": role, "content": msg["content"]})
 
             messages.append({"role": "user", "content": user_text})
 
