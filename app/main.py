@@ -33,17 +33,15 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await repo.ensure_user_exists(user.id, user.username, user.first_name)
 
         welcome_text = (
-            f"👋 **¡Hola {user.first_name}! Soy Echo, tu tutor bilingüe de inglés.**\n\n"
-            "Puedes enviarme:\n"
-            "📝 **Mensajes de texto** - En español o inglés\n"
-            "🎙️ **Notas de voz** - Para practicar pronunciación\n"
-            "🖼️ **Fotos** - Para aprender vocabulario nuevo\n\n"
-            "**También puedo:**\n"
-            "🎓 Enseñarte paso a paso\n"
-            "🔄 Traducir textos\n"
-            "💬 Tener conversaciones sobre cualquier tema\n"
-            "🖼️ Generar imágenes con IA\n\n"
-            "*¡Escribe algo o envíame una foto para empezar!*"
+            f"👋 **¡Hola {user.first_name}! Soy Echo, tu tutor personal de inglés.**\n\n"
+            "🎯 **Mi objetivo:** Ayudarte a aprender inglés de forma fácil y divertida.\n\n"
+            "📚 **¿Qué puedo hacer?**\n"
+            "• 📝 Responder tus preguntas en español o inglés\n"
+            "• 🎙️ Escuchar tus notas de voz y corregir tu pronunciación\n"
+            "• 🖼️ Analizar fotos y enseñarte vocabulario nuevo\n"
+            "• 🔄 Traducir textos y explicarte frases\n"
+            "• 💬 Conversar sobre cualquier tema: escuela, trabajo, viajes, etc.\n\n"
+            "🚀 **¡Empecemos!** Escríbeme algo o envíame una foto para practicar."
         )
         await update.message.reply_markdown(welcome_text)
 
